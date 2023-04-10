@@ -5,6 +5,7 @@ from slack_bolt.adapter.socket_mode import SocketModeHandler
 
 import tokumei
 import tokumei_stamp
+import tokumei_thread
 
 app = App()
 
@@ -20,6 +21,10 @@ def tokumei_post_handler(ack, respond, command):
 @app.command("/tokumei_stamp")
 def tokumei_stamp_handler(ack, respond, command):
     tokumei_stamp.reactions_add(ack, respond, command, client, channel_info["channel"])
+
+@app.command("/tokumei_thread")
+def tokumei_stamp_handler(ack, respond, command):
+    tokumei_thread.post_thread_message(ack, respond, command, client, channel_info["channel"])
 
 if __name__ == "__main__":
     handler = SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"])

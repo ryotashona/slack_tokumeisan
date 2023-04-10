@@ -17,7 +17,7 @@ def reactions_add(ack, respond, command, client:WebClient, channel):
 
         timestamp = float(match.group(1)) / 1000000  # Slackのタイムスタンプ形式に変換
 
-        client.reactions_add(channel=channel['id'], timestamp=timestamp, name=emoji.strip(':'))
+        client.reactions_add(channel=channel['id'], timestamp=str(timestamp), name=emoji.strip(':'))
         respond(text=f"{permalink} へ {emoji} リアクションをしました", response_type="ephemeral")
     except ValueError as e:
         respond(text=f"エラー: {e}")
