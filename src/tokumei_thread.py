@@ -18,7 +18,7 @@ def post_thread_message(ack, respond, command, client:WebClient, channel):
 
         timestamp = float(match.group(1)) / 1000000  # Slackのタイムスタンプ形式に変換
 
-        client.chat_postMessage(channel=channel['id'], thread_ts=timestamp, text=message)
+        client.chat_postMessage(channel=channel['id'], thread_ts=str(timestamp), text=message)
         respond(text=f"{permalink} へ匿名返信をしました ts={timestamp} msg={message}", response_type="ephemeral")
     except ValueError as e:
         respond(text=f"エラー: {e}")
