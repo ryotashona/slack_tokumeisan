@@ -2,6 +2,8 @@ import re
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
+from util import username
+
 def post_thread_message(ack, respond, command, client:WebClient, channel):
     ack()
 
@@ -18,6 +20,7 @@ def post_thread_message(ack, respond, command, client:WebClient, channel):
 
         timestamp = float(match.group(1)) / 1000000  # Slackのタイムスタンプ形式に変換
 
+        message = username.replace_usernames_with_ids(client, message)
         client.chat_postMessage(channel=channel['id'], thread_ts=str(timestamp), text=message)
         respond(text=f"{permalink} へ匿名返信をしました ts={timestamp} msg={message}", response_type="ephemeral")
     except ValueError as e:
