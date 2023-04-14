@@ -1,5 +1,4 @@
 import re
-import logging
 
 from slack_sdk import WebClient
 
