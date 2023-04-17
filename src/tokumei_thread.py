@@ -4,26 +4,71 @@ from slack_sdk.errors import SlackApiError
 
 from util import username
 
-def post_thread_message(ack, respond, command, client:WebClient, channel):
+def modal_open(ack, body, client):
+    # モーダルの定義
+    modal = {
+        "type": "modal",
+        "callback_id": "tokumei_thread_modal",
+        "title": {
+            "type": "plain_text",
+            "text": "Example Modal"
+        },
+        "submit": {
+            "type": "plain_text",
+            "text": "Submit"
+        },
+        "blocks": [
+            {
+                "type": "input",
+                "block_id": "url_block",
+                "label": {
+                    "type": "plain_text",
+                    "text": "URL"
+                },
+                "element": {
+                    "type": "plain_text_input",
+                    "action_id": "url_input"
+                }
+            },
+            {
+                "type": "input",
+                "block_id": "comment_block",
+                "label": {
+                    "type": "plain_text",
+                    "text": "Comment"
+                },
+                "element": {
+                    "type": "plain_text_input",
+                    "action_id": "comment_input",
+                    "multiline": True
+                }
+            }
+        ]
+    }
+
+    # モーダルを表示
+    client.views_open(trigger_id=body["trigger_id"], view=modal)
+    
+    # リクエストの受信を確認
     ack()
 
-    try:
-        args = command["text"].split(' ',1)
-        if len(args) != 2:
-            raise ValueError("正しい形式で入力してください: /tokumei_thread [返信したい投稿URL] [コメント] ")
+def post_thread_message(ack, body, logger, client:WebClient, channel):
+    ack()
 
-        permalink = args[0]
-        message = args[1]
-        match = re.match(r"https?://\S+/archives/\w+/p(\w+)", permalink)
-        if not match:
-            raise ValueError("無効な投稿URLです")
+    # try:
+    permalink = body['view']['state']['values']['url_block']['url_input']['value']
+    message = body['view']['state']['values']['comment_block']['comment_input']['value']
 
-        timestamp = float(match.group(1)) / 1000000  # Slackのタイムスタンプ形式に変換
+    match = re.match(r"https?://\S+/archives/\w+/p(\w+)", permalink)
+    if not match:
+        raise ValueError("無効な投稿URLです")
 
-        message = username.replace_usernames_with_ids(client, message)
-        client.chat_postMessage(channel=channel['id'], thread_ts=str(timestamp), text=message)
-        respond(text=f"{permalink} へ匿名返信をしました ts={timestamp} msg={message}", response_type="ephemeral")
-    except ValueError as e:
-        respond(text=f"エラー: {e}")
-    except SlackApiError as e:
-        respond(text=f"エラー: 匿名返信に失敗しました。t={timestamp} ({e})")
+    timestamp = float(match.group(1)) / 1000000  # Slackのタイムスタンプ形式に変換
+
+    message = username.replace_usernames_with_ids(client, message)
+    client.chat_postMessage(channel=channel['id'], thread_ts=str(timestamp), text=message)
+    #     respond(text=f"{permalink} へ匿名返信をしました ts={timestamp} msg={message}", response_type="ephemeral")
+    # except ValueError as e:
+    #     respond(text=f"エラー: {e}")
+    # except SlackApiError as e:
+    #     respond(text=f"エラー: 匿名返信に失敗しました。t={timestamp} ({e})")

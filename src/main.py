@@ -23,9 +23,13 @@ def tokumei_stamp_handler(ack, respond, command):
     tokumei_stamp.reactions_add(ack, respond, command, client, channel_info["channel"])
 
 @app.command("/tokumei_thread")
-def tokumei_stamp_handler(ack, respond, command):
-    tokumei_thread.post_thread_message(ack, respond, command, client, channel_info["channel"])
+def tokumei_tokumei_thread(ack, body, client):
+    tokumei_thread.modal_open(ack, body, client)
 
+@app.view("tokumei_thread_modal")
+def handle_tokumei_thread_modal(ack, body, logger, client):
+    tokumei_thread.post_thread_message(ack, body, logger, client, channel_info["channel"])
+    
 if __name__ == "__main__":
     handler = SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"])
     handler.start()
