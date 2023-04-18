@@ -31,7 +31,7 @@ def replace_usernames_with_ids(client:WebClient, text):
     text = text.replace("@channel", "<!channel>")
 
     # ユーザーメンション抽出
-    usernames = re.findall(r'@([\w.]+)(?!\w)(?<!\w@\w)', text)
+    usernames = re.findall(r'@([\w._\-]+)(?!\w)(?<!\w@\w)', text)
 
     if not usernames:
         # ユーザーメンションなし
