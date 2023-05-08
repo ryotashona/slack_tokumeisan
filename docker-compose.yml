@@ -10,3 +10,4 @@ services:
       - .env
     volumes:
       - ./src:/app
+    restart: always
